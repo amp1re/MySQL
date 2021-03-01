@@ -5,17 +5,25 @@ CREATE DATABASE serials_base;
 USE serials_base;
 
 -- Tables creation;
+
+DROP TABLE IF EXISTS genres;
+CREATE TABLE genres (
+	id SERIAL PRIMARY KEY,
+	name VARCHAR(100)
+	);
+
 DROP TABLE IF EXISTS serials;
 CREATE TABLE serials (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR(100),
 	country VARCHAR(100),
-	genre VARCHAR(100) COMMENT 'Жанр',
+	genres_id BIGINT UNSIGNED NOT NULL COMMENT 'Жанр',
 	short_description TEXT,
 	full_description TEXT,
 	created_at DATETIME DEFAULT NOW(),
 	updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	INDEX serials_name_genre_idx (name, genre)
+	FOREIGN KEY (genres_id) REFERENCES genres(id),
+	INDEX serials_name_idx (name)
 	) comment = 'Serials description table';
 
 
@@ -31,7 +39,6 @@ CREATE TABLE users (
     INDEX users_firstname_lastname_idx(firstname, lastname)
 	);
 	
-
 DROP TABLE IF EXISTS episodes;
 CREATE TABLE episodes (
 	id SERIAL PRIMARY KEY,
@@ -39,7 +46,6 @@ CREATE TABLE episodes (
 	n_season INT,
 	n_episode INT,
 	name VARCHAR(100),
-	duration INT,
 	created_at DATETIME DEFAULT NOW(),
 	updated_at DATETIME DEFAULT NOW() ON UPDATE CURRENT_TIMESTAMP,
 	FOREIGN KEY (serials_id) REFERENCES serials(id) 
@@ -48,18 +54,25 @@ CREATE TABLE episodes (
 
 DROP TABLE IF EXISTS crew;
 CREATE TABLE crew (
-	id BIGINT UNSIGNED NOT NULL,
-	serials_id BIGINT UNSIGNED NOT NULL,
+	id SERIAL PRIMARY KEY,
 	profession VARCHAR(100),
 	firstname VARCHAR(100),
 	lastname VARCHAR (100),
 	gender CHAR(1),
 	birthdate DATE,
-	photo_id BIGINT UNSIGNED NULL,
-	PRIMARY KEY (id, serials_id),
+	photo_id BIGINT UNSIGNED NULL
+	) comment = 'Сьемочная группа';
+
+DROP TABLE IF EXISTS crew_serial;
+CREATE TABLE crew_serial (
+	crew_id BIGINT UNSIGNED NOT NULL,
+	serials_id BIGINT UNSIGNED NOT NULL,
+	PRIMARY KEY (crew_id, serials_id),
+	FOREIGN KEY (crew_id) REFERENCES crew(id)
+	ON UPDATE CASCADE ON DELETE CASCADE,
 	FOREIGN KEY (serials_id) REFERENCES serials(id)
 	ON UPDATE CASCADE ON DELETE CASCADE
-	) comment = 'Сьемочная группа';
+	);
 
 DROP TABLE IF EXISTS news;
 CREATE TABLE news (

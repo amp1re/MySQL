@@ -68,14 +68,5 @@ CREATE OR REPLACE VIEW serials_info AS
 				) f ON s.id = f.serials_id
 	ORDER BY s.id;
 
-		
-
-
-'Количество сезонов'
-'Количесво серий'
-'Избранный сериал у пользователя'
-'Количество новостей'
-
-
 
 	
